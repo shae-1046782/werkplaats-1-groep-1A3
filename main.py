@@ -5,14 +5,14 @@ from modules.Game import Game
 def main():
 
     WIDTH = 16
-    HEIGTH = 16
+    HEIGHT = 16
 
-    DUNGEON = Game(WIDTH, HEIGTH)
+    DUNGEON = Game(WIDTH, HEIGHT)
 
     SCREEN = DUNGEON.get_screen()
     deltatime = DUNGEON.get_deltatime()
 
-    PLAYER = Player(SCREEN, WIDTH, HEIGTH)
+    PLAYER = Player(SCREEN, WIDTH, HEIGHT)
     PLAYER.set_starting_position(1, 1)
 
     while True:
@@ -22,7 +22,7 @@ def main():
         else: 
             
             cols, rows = DUNGEON.get_grid_dimensions()
-            DUNGEON.draw(cols, rows, WIDTH, HEIGTH)
+            DUNGEON.draw(cols, rows, WIDTH, HEIGHT)
 
             up, down, left, right, spacebar, interact = PLAYER.actions(deltatime)
             PLAYER.draw()

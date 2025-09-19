@@ -22,7 +22,6 @@ class Player:
         self.y = 0
 
         self.alternate = False
-        self.direction = dict({"walk": [0, 1], "idle": [1,3]})
 
     def load_frame_data(self, sprite_path: str):
 
@@ -118,7 +117,8 @@ class Player:
             frame_index = (pygame.time.get_ticks() // 600) % frame_count
             frame_index = idle_frames[frame_index]
 
-        sprite = pygame.transform.scale(self.frames[frame_index], ((self.width * 1.2 * self.multiplier), ((self.height * 1.3 * self.multiplier))))
+        size = int(self.width * 1.2 * self.multiplier), int(self.height * 1.3 * self.multiplier)
+        sprite = pygame.transform.scale(self.frames[frame_index], size)
         
         if self.y == 0: offset = 0
         else: offset = 0.4
@@ -126,4 +126,4 @@ class Player:
         px = self.x * self.width * self.multiplier + (self.width * self.multiplier) // 2 - sprite.get_width() // 2
         py = (self.y - offset) * self.height * self.multiplier + (self.height * self.multiplier) // 2 - sprite.get_height() // 2
         
-        self.screen.blit(sprite, (px, py))
+        self.screen.blit(sprite, (int(round(px)), int(round(py))))
