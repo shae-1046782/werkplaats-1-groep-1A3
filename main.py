@@ -14,8 +14,8 @@ def main() -> None:
     DUNGEON: Game = Game(WIDTH, HEIGHT)
 
     # Get the game screen and initial delta time
-    SCREEN = DUNGEON.get_screen()
-    deltatime: float = DUNGEON.get_deltatime()
+    SCREEN = DUNGEON.get_screen
+    deltatime: float = DUNGEON.get_deltatime
 
     # Create the player and set their starting position
     PLAYER: Player = Player(SCREEN, WIDTH, HEIGHT)
@@ -25,7 +25,7 @@ def main() -> None:
     while True:
 
         # Exit loop if the game is inactive (e.g., window closed)
-        if DUNGEON.inactive():
+        if DUNGEON.inactive:
             break
         
         else:

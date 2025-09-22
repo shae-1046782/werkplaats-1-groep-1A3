@@ -18,46 +18,54 @@ class Game:
 
         pygame.init()
 
-        self.deltatime: float = pygame.time.get_ticks() / 1000.0  
-        self.clock: pygame.time.Clock = pygame.time.Clock()     
-        self.screen: pygame.Surface = pygame.display.set_mode((screen[0], screen[1])) 
+        self._deltatime: float = pygame.time.get_ticks() / 1000.0  
+        self._clock: pygame.time.Clock = pygame.time.Clock()     
+        self._screen: pygame.Surface = pygame.display.set_mode((screen[0], screen[1])) 
 
-        self.width: int = width
-        self.height: int = height
-        self.multiplier: float = multiplier
+        self._width: int = width
+        self._height: int = height
+        self._multiplier: float = multiplier
 
-    def get_cols(self) -> int:
+    ###########################################################################
+    
+    def _get_cols(self) -> int:
         """ Calculate the number of columns that fit on the screen. """
 
-        return int(self.screen.get_width() // (self.width * self.multiplier))
+        return int(self._screen.get_width() // (self._width * self._multiplier))
     
-    def get_rows(self) -> int:
+    def _get_rows(self) -> int:
         """ Calculate the number of rows that fit on the screen. """
 
-        return int(self.screen.get_height() // (self.height * self.multiplier))
-
+        return int(self._screen.get_height() // (self._height * self._multiplier))
+    
     def get_grid_dimensions(self) -> tuple[int, int]:
         """ Get the number of columns and rows that fit on the screen. """
         
-        cols = self.get_cols()
-        rows = self.get_rows()
+        cols = self._get_cols()
+        rows = self._get_rows()
         return cols, rows
 
+    @property
     def get_screen(self) -> pygame.Surface:
         """ Get the games display surface. """
 
-        return self.screen
+        return self._screen
     
+    @property
     def get_deltatime(self) -> float:
         """ Get the time elapsed between frames. """
 
-        return self.deltatime
+        return self._deltatime
     
+    @property
     def get_clock(self) -> pygame.time.Clock:
         """ Get the game clock object. """
 
-        return self.clock
-
+        return self._clock
+    
+    ###########################################################################
+    
+    @property
     def inactive(self) -> bool:
         """ Handle game events and check if the window should close. """
 
@@ -73,14 +81,18 @@ class Game:
                 
         return False
     
+    ###########################################################################
+    
     def update(self) -> float:
         """ Update the display and calculate delta time for the current frame. """
         
         pygame.display.flip()
 
         # Limit to 60 FPS
-        self.deltatime = self.clock.tick(60) / 1000.0  
-        return self.deltatime
+        self._deltatime = self._clock.tick(60) / 1000.0  
+        return self.get_deltatime
+    
+    ###########################################################################
     
     def draw(self, cols: int, rows: int, width: int, height: int) -> None:
         """
@@ -92,13 +104,13 @@ class Game:
         """
         
         # Fill background with dark gray
-        self.screen.fill((20, 20, 20))  
+        self._screen.fill((20, 20, 20))  
 
-        width = int(width * self.multiplier)
-        height = int(height * self.multiplier)
+        width = int(width * self._multiplier)
+        height = int(height * self._multiplier)
 
         for col in range(cols):
             for row in range(rows):
                 # Draw grid cell outline
                 rect = pygame.Rect(col * width, row * height, width, height)
-                pygame.draw.rect(self.screen, (50, 50, 50), rect, 1)  
+                pygame.draw.rect(self._screen, (50, 50, 50), rect, 1)  

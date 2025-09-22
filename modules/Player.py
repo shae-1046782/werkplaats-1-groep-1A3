@@ -25,7 +25,7 @@ class Player:
             self,  screen: pygame.Surface, 
             width: int, height: int, multiplier: float = 4
         ):
-        
+
         """
         Initialize the Player object.
         -    screen: The surface to draw the player on.
@@ -34,10 +34,8 @@ class Player:
         -    multiplier: Scale multiplier for rendering.
         """
 
-        super().__init__()
-
         # Load player frames
-        self.FRAMES = load_frames([
+        self._FRAMES = load_frames([
             {
                 "title": "general",
                 "path": "assets/sprites/player/hero.png",
@@ -46,39 +44,33 @@ class Player:
             },
         ])
 
-        self.state: str = STATE_GENERAL
-        self.move_cooldown: float = MOVE_COOLDOWN
-        self.frame_direction = FRAME_ANIMATIONS["action:right"]
+        self._state: str = STATE_GENERAL
+        self._move_cooldown: float = MOVE_COOLDOWN
+        self._frame_direction = FRAME_ANIMATIONS["action:right"]
         
-        self.screen: pygame.Surface = screen
-        self.multiplier: float = multiplier
+        self._screen: pygame.Surface = screen
+        self._multiplier: float = multiplier
 
-        self.width: int = width
-        self.height: int = height
+        self._width: int = width
+        self._height: int = height
 
-        self.x: int = 0
-        self.y: int = 0
+        self._x: int = 0
+        self._y: int = 0
 
-        self.alternate: bool = False
-        
-        self.attack_animating: bool = False
-        self.attack_frame_index: int = 0
-        self.attack_anim_start_time: int = 0
-
-        self.direction: str = "right"
-        self.move_timer: float = 0.0
+        self._alternate: bool = False
+        self._move_timer: float = 0.0
 
     ###########################################################################
     
     def set_starting_position(self, x: int, y: int) -> None:
         """
         Set the player's starting position.
-        -    x (int): X position.
-        -    y (int): Y position.
+        -    x: X position.
+        -    y: Y position.
         """
 
-        self.x = x
-        self.y = y
+        self._x = x
+        self._y = y
 
     ###########################################################################
     
@@ -92,15 +84,28 @@ class Player:
     def _cooldown_done(self) -> bool:
         """ Check if move cooldown is active. """
 
-        return self.move_timer > 0
+        return self._move_timer > 0
     
     ###########################################################################
     
     def get_position(self) -> tuple[int, int]:
         """ Get the current player position. """
 
-        return (self.x, self.y)
+        return (self._x, self._y)
     
+    def _get_frame_direction(self, animation_type: str) -> list:
+        """
+        Get frame indices for a given animation type.
+        - animation_type: ("idle", "walk").
+        """
+
+        return self._frame_direction[self._state][animation_type]
+    
+    def _get_frame(self, frame_index: int) -> pygame.Surface:
+        """ Get the specific frame surface by index. """
+
+        return self._FRAMES[self._state][frame_index]
+        
     def _get_frame_animations(self, direction: str) -> dict:
         """
         Get frame animations for a given direction.
@@ -109,17 +114,22 @@ class Player:
 
         return FRAME_ANIMATIONS[f"action:{direction}"]
     
+    def _get_alternation(self) -> bool:
+        """ Get the current alternation state for walking animation. """
+
+        return self._alternate
+    
     ###########################################################################
 
     def _update_alternate(self) -> None:
         """ Toggle the alternate frame for walking animation. """
 
-        self.alternate = not self.alternate
+        self._alternate = not self._get_alternation()
 
     def _update_timer(self) -> None:
         """ Reset the move timer to the cooldown value. """
 
-        self.move_timer = self.move_cooldown
+        self._move_timer = self._move_cooldown
 
     def _update_state(self, state: str) -> None:
         """
@@ -127,24 +137,23 @@ class Player:
         -    state: ("general").
         """
 
-        self.state = state
+        self._state = state
 
-    def update_frame_direction(self, direction: str) -> None:
+    def _update_frame_direction(self, direction: str) -> None:
         """
         Update the frame direction for animation.
         -  direction: ("up", "down", "right", "left").
         """
 
-        self.direction = direction
-        self.frame_direction = self._get_frame_animations(direction)
+        self._frame_direction = self._get_frame_animations(direction)
     
-    def update_sprite_frame(self, direction: str) -> None:
+    def _update_sprite_frame(self, direction: str) -> None:
         """
         Update the sprite frame and direction for movement.
         -  direction: ("up", "down", "right", "left").
         """
 
-        self.update_frame_direction(direction)
+        self._update_frame_direction(direction)
         self._update_alternate()
         self._update_timer()
 
@@ -156,7 +165,7 @@ class Player:
         - deltatime: Time since last update.
         """
 
-        self.move_timer -= deltatime
+        self._move_timer -= deltatime
 
         if self._cooldown_done():
             return (False, False, False, False, False, False)
@@ -178,30 +187,30 @@ class Player:
     def down(self, rows: int) -> None:
         """ Move the player down. """
 
-        self.update_sprite_frame("down")
-        if self.y < (rows - 1):
-            self.y += 1
+        self._update_sprite_frame("down")
+        if self._y < (rows - 1):
+            self._y += 1
 
     def left(self) -> None:
         """ Move the player left."""
 
-        self.update_sprite_frame("left")
-        if self.x > 0:
-            self.x -= 1
+        self._update_sprite_frame("left")
+        if self._x > 0:
+            self._x -= 1
     
     def right(self, cols: int) -> None:
         """ Move the player right. """
 
-        self.update_sprite_frame("right")
-        if self.x < (cols - 1):
-            self.x += 1
+        self._update_sprite_frame("right")
+        if self._x < (cols - 1):
+            self._x += 1
         
     def up(self) -> None:
         """ Move the player up. """
 
-        self.update_sprite_frame("up")
-        if self.y > 0:
-            self.y -= 1
+        self._update_sprite_frame("up")
+        if self._y > 0:
+            self._y -= 1
 
     def spacebar(self) -> None:
         """ Handle spacebar action (e.g., attack). """
@@ -222,7 +231,7 @@ class Player:
         - speed: Animation speed in ms.
         """
 
-        frames = self.frame_direction[self.state][animation_type]
+        frames = self._get_frame_direction(animation_type)
         count = len(frames)
         index = (pygame.time.get_ticks() // speed) % count
         return frames, index, count, speed
@@ -239,7 +248,7 @@ class Player:
         """ Get the movement frame index. """
 
         frames = self._handle_animation("walk")[0]
-        return frames[1] if self.alternate else frames[0]
+        return frames[1] if self._get_alternation else frames[0]
 
     ###########################################################################
 
@@ -256,37 +265,42 @@ class Player:
         height_enlarge = SCALE_ENLARGE_HEIGHT
 
         # Calculate y offset based on row
-        if self.y == 0:
+        if self._y == 0:
             y_offset = OFFSET_Y_TOP
+
         else:
             y_offset = OFFSET_Y_DEFAULT
 
         # Calculate x offset based on column
-        if self.x == 0:
+        if self._x == 0:
             x_offset = OFFSET_X_LEFT
-        elif self.x == cols - 1:
+
+        elif self._x == cols - 1:
             x_offset = -OFFSET_X_LEFT
+
         else:
             x_offset = 0
 
         # Select frame based on movement or idle state
         if self._is_moving() or self._cooldown_done(): 
             frame_index = self._handle_movement()
+
         else: 
             frame_index = self._handle_idle()
         
         # Calculate sprite size
         size = (
-            int(self.width * width_enlarge * self.multiplier),
-            int(self.height * height_enlarge * self.multiplier)
+            int(self._width * width_enlarge * self._multiplier),
+            int(self._height * height_enlarge * self._multiplier)
         )
 
-        # Scale the sprite
-        sprite = pygame.transform.scale(self.FRAMES[self.state][frame_index], size)
+        # Get and scale the selected frame
+        selected_frame = self._get_frame(frame_index)
+        sprite = pygame.transform.scale(selected_frame, size)
 
         # Calculate position to center the sprite
-        x_pos = (self.x + x_offset) * self.width * self.multiplier + (self.width * self.multiplier) // 2 - sprite.get_width() // 2
-        y_pos = (self.y - y_offset) * self.height * self.multiplier + (self.height * self.multiplier) // 2 - sprite.get_height() // 2
+        x_pos = (self._x + x_offset) * self._width * self._multiplier + (self._width * self._multiplier) // 2 - sprite.get_width() // 2
+        y_pos = (self._y - y_offset) * self._height * self._multiplier + (self._height * self._multiplier) // 2 - sprite.get_height() // 2
 
         # Draw the sprite on the screen
-        self.screen.blit(sprite, (int(round(x_pos) - x_player_offset), int(round(y_pos) - y_player_offset)))
+        self._screen.blit(sprite, (int(round(x_pos) - x_player_offset), int(round(y_pos) - y_player_offset)))
